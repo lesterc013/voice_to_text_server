@@ -1,5 +1,5 @@
 venv312
-test_audio_clips
+whisper_downloads
 __pycache__/
 *.pyc
 *.pyo
