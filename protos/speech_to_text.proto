@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+// Uncomment below for Unity
+// option csharp_namespace = "SpeechToTextClient";
+
+package SpeechToTextComponents;
+
+// This becomes the base class that will implement the rpc calls
+service SpeechToTextHandler {
+	// This will be the method that client will call and pass in the request, then server will implement what to do with the request.
+	rpc TranscribeWhisperX (SttRequest) returns (WhisperXResponse);
+}
+
+// The client must pass over the path to the audio file
+message SttRequest {
+	string audio_file_path = 1;
+}
+
+// Server passes back what? Cos whisperX can pass back so many stuff
+message WhisperXResponse {
+}
+
+// There may be other implementations in future hence I used the response message WhisperXResponse instead of SttResponse
+

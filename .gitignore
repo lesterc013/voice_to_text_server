@@ -1,0 +1,7 @@
+venv312
+test_audio_clips
+__pycache__/
+*.pyc
+*.pyo
+.env
+.DS_Store
