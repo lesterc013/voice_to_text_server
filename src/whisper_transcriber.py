@@ -1,18 +1,28 @@
 # This class allows the server to instantiate and make the transcription
 
+import sys
+import os
 import numpy as np
 from pydub import AudioSegment
 import torch
 from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor
-from whisper_downloader import WhisperDownloaderInformation
 
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
 torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
 
+# Commented this out cos this only works for dev build
 # Get the paths from the single source of truth: the downloader object
-whisper_download_paths = WhisperDownloaderInformation()
-model_save_path = whisper_download_paths.model_save_path
-processor_save_path = whisper_download_paths.processor_save_path
+# whisper_download_paths = WhisperDownloaderInformation()
+# model_save_path = whisper_download_paths.model_save_path
+# processor_save_path = whisper_download_paths.processor_save_path
+
+
+# Function that if its the pyinstaller one, then need to add a ./_internal before the dev relative I think
+def get_correct_path(behind_path):
+    if getattr(sys, "frozen", False):
+        return "./_internal" + behind_path
+    else:
+        return "." + behind_path
 
 
 # Abstract out this method to not overcrowd the WhisperTranscriber class
@@ -28,9 +38,13 @@ def generate_samples_from_wav(wav_file_path):
 class WhisperTranscriber:
     # Constructor will instantiate the model and processor
     def __init__(self):
-        self.model = AutoModelForSpeechSeq2Seq.from_pretrained(model_save_path)
+        # This sets the correct path - prepend ./internal to the relative path
+        model_path = get_correct_path("/whisper_downloads/whisper_medium_model")
+        processor_path = get_correct_path("/whisper_downloads/whisper_medium_processor")
+
+        self.model = AutoModelForSpeechSeq2Seq.from_pretrained(model_path)
         self.model.to(device)
-        self.processor = AutoProcessor.from_pretrained(processor_save_path)
+        self.processor = AutoProcessor.from_pretrained(processor_path)
 
     def transcribe_from_wav(self, wav_file_path):
         samples = generate_samples_from_wav(wav_file_path)
