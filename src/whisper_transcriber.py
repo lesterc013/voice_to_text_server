@@ -6,12 +6,6 @@ import logging
 import numpy as np
 from pydub import AudioSegment
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    datefmt="%d-%m-%Y %H:%M:%S",
-)
-
 logger = logging.getLogger(__name__)
 
 logger.info("Importing AI libraries...")
