@@ -24,9 +24,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Create an instance of the WhisperTranscriber class: This is the main class that will do the transcribing
-logger.info("Loading VTT model. Standby...")
 whisper_transcriber = WhisperTranscriber()
-logger.info("Model successfully loaded")
 
 
 # This class is based on the gRPC framework requirements

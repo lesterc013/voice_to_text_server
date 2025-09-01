@@ -1,10 +1,23 @@
 # This class allows the server to instantiate and make the transcription
+# I added alot of logger.info because want to provide some feedback on those areas where there is some perceived stalling
 
 import sys
+import logging
 import numpy as np
 from pydub import AudioSegment
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    datefmt="%d-%m-%Y %H:%M:%S",
+)
+
+logger = logging.getLogger(__name__)
+
+logger.info("Importing AI libraries...")
 import torch
 from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor
+
 
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
 torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
@@ -41,12 +54,14 @@ class WhisperTranscriber:
         # This sets the correct path - prepend ./internal to the relative path
         model_path = get_correct_path("/whisper_downloads/whisper_medium_model")
         processor_path = get_correct_path("/whisper_downloads/whisper_medium_processor")
-
+        logger.info("Loading VTT model. Standby...")
         self.model = AutoModelForSpeechSeq2Seq.from_pretrained(model_path)
         self.model.to(device)
         self.processor = AutoProcessor.from_pretrained(processor_path)
+        logger.info("Model successfully loaded")
 
     def transcribe_from_wav(self, wav_file_path):
+        logger.info("Transcription request received, transcribing...")
         samples = generate_samples_from_wav(wav_file_path)
         inputs = self.processor(
             samples,
@@ -69,6 +84,7 @@ class WhisperTranscriber:
         transcription = self.processor.batch_decode(
             generated_ids, skip_special_tokens=True
         )
+        logger.info("Transcription completed")
         return transcription[0]
 
 
