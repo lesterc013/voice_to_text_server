@@ -1,7 +1,6 @@
 # This class allows the server to instantiate and make the transcription
 
 import sys
-import os
 import numpy as np
 from pydub import AudioSegment
 import torch
@@ -17,7 +16,8 @@ torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
 # processor_save_path = whisper_download_paths.processor_save_path
 
 
-# Function that if its the pyinstaller one, then need to add a ./_internal before the dev relative I think
+# Function that if its the pyinstaller one, then need to add a ./_internal before the dev relative
+# This is because the from_pretrained only accepts relative paths
 def get_correct_path(behind_path):
     if getattr(sys, "frozen", False):
         return "./_internal" + behind_path
