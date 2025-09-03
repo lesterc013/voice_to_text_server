@@ -4,10 +4,10 @@ import os
 from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor
 
 # FYI: Learner laptop specs of 5050 8GB VRAM upper limit is medium cos medium needs 5GB VRAM but large needs 10GB VRAM
-model_id = "openai/whisper-medium"
+# model_id = "jacktol/whisper-medium.en-fine-tuned-for-ATC"
 
-processor_save_path = "./whisper_downloads/processors"
-model_save_path = "./whisper_downloads/models"
+model_save_path = r"whisper_downloads\whisper_medium_model"
+processor_save_path = r"whisper_downloads\whisper_medium_processor"
 
 # Only run the download if running directly. Else if importing as a module, then I only care about the class
 if __name__ == "__main__":
@@ -21,10 +21,3 @@ if __name__ == "__main__":
     print("Downloading processor")
     processor = AutoProcessor.from_pretrained(model_id)
     processor.save_pretrained(processor_save_path)
-
-
-# To import in the transcriber so that we can have one source of truth for the model and processor paths
-class WhisperDownloaderInformation:
-    def __init__(self):
-        self.model_save_path = model_save_path
-        self.processor_save_path = processor_save_path

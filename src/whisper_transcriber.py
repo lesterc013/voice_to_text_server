@@ -2,34 +2,46 @@
 # I added alot of logger.info because want to provide some feedback on those areas where there is some perceived stalling
 
 import sys
-import logging
+import os
 import numpy as np
 from pydub import AudioSegment
+import torch
+import logging
 
 logger = logging.getLogger(__name__)
 
-logger.info("Importing AI libraries...")
-import torch
+logger.info("Importing ML tools..")
 from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor
 
+
+model_path_dev = "whisper_fine_tuning\whisper_medium_model_AawMaster"
+processor_path_dev = "whisper_fine_tuning\whisper_medium_processor_AawMaster"
 
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
 torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
 
-# Commented this out cos this only works for dev build
-# Get the paths from the single source of truth: the downloader object
-# whisper_download_paths = WhisperDownloaderInformation()
-# model_save_path = whisper_download_paths.model_save_path
-# processor_save_path = whisper_download_paths.processor_save_path
 
-
-# Function that if its the pyinstaller one, then need to add a ./_internal before the dev relative
-# This is because the from_pretrained only accepts relative paths
 def get_correct_path(behind_path):
     if getattr(sys, "frozen", False):
-        return "./_internal" + behind_path
+        # For PyInstaller, files are in the same directory as the executable
+        # or in the _MEIPASS folder during execution
+        base_dir = (
+            os.path.dirname(sys.executable)
+            if hasattr(sys, "_MEIPASS")
+            else getattr(sys, "_MEIPASS", os.path.dirname(sys.executable))
+        )
+        full_path = os.path.join(base_dir, behind_path)
+
+        # Also check in the _MEIPASS temporary directory (for onefile mode)
+        if not os.path.exists(full_path) and hasattr(sys, "_MEIPASS"):
+            meipass_path = os.path.join(sys._MEIPASS, behind_path)
+            if os.path.exists(meipass_path):
+                return meipass_path
+
+        print("full_path from frozen: " + full_path)
+        return full_path
     else:
-        return "." + behind_path
+        return behind_path
 
 
 # Abstract out this method to not overcrowd the WhisperTranscriber class
@@ -45,9 +57,8 @@ def generate_samples_from_wav(wav_file_path):
 class WhisperTranscriber:
     # Constructor will instantiate the model and processor
     def __init__(self):
-        # This sets the correct path - prepend ./internal to the relative path
-        model_path = get_correct_path("/whisper_downloads/whisper_medium_model")
-        processor_path = get_correct_path("/whisper_downloads/whisper_medium_processor")
+        model_path = get_correct_path(model_path_dev)
+        processor_path = get_correct_path(processor_path_dev)
         logger.info("Loading VTT model. Standby...")
         self.model = AutoModelForSpeechSeq2Seq.from_pretrained(model_path)
         self.model.to(device)

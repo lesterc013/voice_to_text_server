@@ -8,26 +8,17 @@ import sys
 import grpc
 from concurrent import futures
 import logging
-from whisper_transcriber import WhisperTranscriber
 
-# Contains the base classes
+logger = logging.getLogger(__name__)
+
+# Contains the base classes and message types respectively
 import voice_to_text_pb2_grpc
 
 # Contains the message types
 import voice_to_text_pb2
 
-# Configure logging at the very start
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    datefmt="%d-%m-%Y %H:%M:%S",
-    handlers=[
-        logging.FileHandler("whisper_server_log.log", mode="a"),
-        logging.StreamHandler(),
-    ],
-)
+from whisper_transcriber import WhisperTranscriber
 
-logger = logging.getLogger(__name__)
 
 # Create an instance of the WhisperTranscriber class: This is the main class that will do the transcribing
 whisper_transcriber = WhisperTranscriber()

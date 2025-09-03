@@ -8,3 +8,4 @@ __pycache__/
 build
 dist
 whisper_server_log.log
+whisper_fine_tuning
