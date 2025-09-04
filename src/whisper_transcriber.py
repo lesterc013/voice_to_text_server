@@ -17,6 +17,9 @@ from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor
 model_path_dev = "whisper_fine_tuning\whisper_medium_model_AawMaster"
 processor_path_dev = "whisper_fine_tuning\whisper_medium_processor_AawMaster"
 
+model_path_no_ft = "whisper_downloads\whisper_medium_model"
+processor_path_no_ft = "whisper_downloads\whisper_medium_processor"
+
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
 torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
 
@@ -78,7 +81,13 @@ class WhisperTranscriber:
         )
         inputs = inputs.to(device, torch.float32)
 
-        # transcribe audio to ids
+        # Uncomment this in case there is EOS token id problem again. The issue was because in the fine tuned model's generation_config.json, "eos_token_id": 50257, instead of saving as an int, was saved as a list i.e. [50257]. Can't find the root cause but changing this to plain int 50257 seemed to fix the issue
+        # print(
+        #     "EOS token id:",
+        #     self.model.generation_config.eos_token_id,
+        #     type(self.model.generation_config.eos_token_id),
+        # )
+
         generated_ids = self.model.generate(
             **inputs,
             return_timestamps=True,
@@ -95,7 +104,20 @@ class WhisperTranscriber:
 
 if __name__ == "__main__":
     transcriber = WhisperTranscriber()
-    transcription = transcriber.transcribe_from_wav(
-        r"C:\Users\mtsec\Documents\Audacity\aaw_test_wav.wav"
-    )
+    # Testing transcriber on the problem wav files
+    problemWavFiles = [
+        "C:/Users/mtsec/UnityProjects/AawSmartTrainer/Voice Recordings/04092025/113704497-eos-error.wav",
+        "C:/Users/mtsec/UnityProjects/AawSmartTrainer/Voice Recordings/04092025/113720002-eos-error.wav",
+        "C:/Users/mtsec/UnityProjects/AawSmartTrainer/Voice Recordings/04092025/113728845-eos-error.wav",
+    ]
+
+    okWavFile = "C:/Users/mtsec/UnityProjects/AawSmartTrainer/Voice Recordings/04092025/113716432.wav"
+
+    print("Transcribing ok file..")
+    transcription = transcriber.transcribe_from_wav(okWavFile)
     print(transcription)
+
+    for problemWavFile in problemWavFiles:
+        print("Trying to transcribe problem file..")
+        transcription = transcriber.transcribe_from_wav(problemWavFile)
+        print(transcription)
