@@ -69,7 +69,7 @@ class WhisperTranscriber:
         logger.info("Model successfully loaded")
 
     def transcribe_from_wav(self, wav_file_path):
-        logger.info("Transcription request received, transcribing...")
+        logger.info(f"Transcription request received, transcribing {wav_file_path}")
         samples = generate_samples_from_wav(wav_file_path)
         inputs = self.processor(
             samples,
