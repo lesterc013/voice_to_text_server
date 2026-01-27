@@ -10,8 +10,10 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+logger.info("Starting Voice-To-Text Server v27012026")
 logger.info("Importing ML tools..")
 from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor
+from number_parser import parse
 
 
 model_path_dev = "whisper_fine_tuning\whisper_medium_model_AawMaster"
@@ -98,8 +100,9 @@ class WhisperTranscriber:
         transcription = self.processor.batch_decode(
             generated_ids, skip_special_tokens=True
         )
+        parsedNumbers = parse(transcription[0])
         logger.info("Transcription completed")
-        return transcription[0]
+        return parsedNumbers
 
 
 if __name__ == "__main__":
