@@ -1,8 +1,13 @@
 # -*- mode: python ; coding: utf-8 -*-
 from PyInstaller.utils.hooks import copy_metadata
 
-datas = [('whisper_fine_tuning/whisper_medium_model_AawMaster', 'whisper_fine_tuning/whisper_medium_model_AawMaster'), ('whisper_fine_tuning/whisper_medium_processor_AawMaster', 'whisper_fine_tuning/whisper_medium_processor_AawMaster')]
+datas = [
+    ('whisper_fine_tuning/whisper_medium_model_AawMaster', 'whisper_fine_tuning/whisper_medium_model_AawMaster'), 
+    ('whisper_fine_tuning/whisper_medium_processor_AawMaster', 'whisper_fine_tuning/whisper_medium_processor_AawMaster'), (r'C:\Users\mtsec\python_projects\voice_to_text_server\venv312\Lib\site-packages\number_parser\VERSION', 'number_parser'),
+    (r'C:\Users\mtsec\python_projects\voice_to_text_server\venv312\Lib\site-packages\number_parser\data', 'number_parser/data')
+    ]
 datas += copy_metadata('torchcodec', recursive=True)
+datas += copy_metadata('number-parser', recursive=True)
 
 
 a = Analysis(
@@ -10,7 +15,7 @@ a = Analysis(
     pathex=[],
     binaries=[],
     datas=datas,
-    hiddenimports=[],
+    hiddenimports=['number_parser'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
